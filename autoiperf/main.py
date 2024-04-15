@@ -4,11 +4,13 @@ import autoiperf.plot as p
 
 
 def run_iperf(client_ip, n, mss):
-    result = subprocess.run([
-        'iperf', '-c', client_ip, '-i', '1', '-t', '10',
-        '--format', 'bits', '-M', str(mss),
-        '-P', str(n)], stdout=subprocess.PIPE)
-    output = result.stdout.decode("utf-8")
+    output = ''
+    for _ in range(3):
+        result = subprocess.run([
+            'iperf', '-c', client_ip, '-i', '1', '-t', '10',
+            '--format', 'bits', '-M', str(mss),
+            '-P', str(n)], stdout=subprocess.PIPE)
+        output += result.stdout.decode("utf-8")
     return output
 
 
