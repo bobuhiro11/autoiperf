@@ -1,11 +1,21 @@
 # autoiperf
 
-FIXME.
-A thin wrapper around iperf.
+A thin wrapper around `iperf -c` command.
+It can also output and get the following figures:
+
+  Packet rate (Mpps)       |  L2 Throughput (Gbps)       |  L1 Throughput (Gbps)
+:-------------------------:|:---------------------------:|:---------------------------:
+  ![](docs/Mpps.png)       |  ![](docs/L2Gbps.png)       |  ![](docs/L1Gbps.png)
 
 ## Usage
 
-FIXME.
+```bash
+# On server side:
+iperf -s
+
+# On client side:
+python -m autoiperf.main
+```
 
 ## Theoretical values
 

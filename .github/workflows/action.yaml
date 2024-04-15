@@ -1,0 +1,23 @@
+name: action
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron:  '0 0 * * *'
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: install deps
+        run: |
+          sudo apt install -y iperf
+          python3 -m pip install tox
+          python3 -m pip install -r ./requirements.txt
+      - name: run test
+        run: |
+          tox
+          iperf -s &
+          python3 -m autoiperf.main localhost 16 50
+          cat *.csv
