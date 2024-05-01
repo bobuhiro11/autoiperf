@@ -10,6 +10,17 @@ def get_prefix():
     return now + "-autoiperf-"
 
 
+def L1Gbps(pkt_size, Mpps):
+    # include preameble(8Bytes)+inter frame gap(12Bytes)
+    Mbps = (pkt_size + 8 + 12) * Mpps * 8
+    return Mbps / 1e3
+
+
+def L2Gbps(pkt_size, Mpps):
+    Mbps = pkt_size * Mpps * 8
+    return Mbps / 1e3
+
+
 def plot_L1Gbps(packet_sizes, Mppss, link_speed_bps):
     prefix = get_prefix()
 
@@ -19,10 +30,7 @@ def plot_L1Gbps(packet_sizes, Mppss, link_speed_bps):
 
     # Calc actual throuput.
     for i, pkt_size in enumerate(packet_sizes):
-        # include preameble(8Bytes)+inter frame gap(12Bytes)
-        Mbps = (pkt_size + 8 + 12) * Mppss[i] * 8
-        Gbps = Mbps / 1e3
-        Y.append(Gbps)
+        Y.append(L1Gbps(pkt_size, Mppss[i]))
 
     # Calc theoretical maximum throuput.
     for pkt_size in packet_sizes:
@@ -69,9 +77,7 @@ def plot_L2Gbps(packet_sizes, Mppss, link_speed_bps):
 
     # Calc actual throuput.
     for i, pkt_size in enumerate(packet_sizes):
-        Mbps = pkt_size * Mppss[i] * 8
-        Gbps = Mbps / 1e3
-        Y.append(Gbps)
+        Y.append(L2Gbps(pkt_size, Mppss[i]))
 
     # Calc theoretical maximum throuput.
     for pkt_size in packet_sizes:

@@ -49,7 +49,10 @@ def main():
         mss = pkt_size - 40
         output = run_iperf(args.client_ip, args.n, mss)
         mpps = get_mpps(output, mss)
-        print('pkt_size', pkt_size, 'mpps', mpps)
+        l1gbps = p.L1Gbps(pkt_size, mpps)
+        print('pkt_size', pkt_size,
+              'mpps', mpps,
+              'L1Gbps', l1gbps)
         Mppss.append(mpps)
 
     # Plot
