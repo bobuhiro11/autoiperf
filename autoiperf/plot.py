@@ -5,9 +5,13 @@ import csv
 THEME = "grayscale"
 
 
-def get_prefix():
+def get_prefix(filename):
     now = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
-    return now + "-autoiperf-"
+
+    if filename is None:
+        return now + "-autoiperf-"
+
+    return now + "-autoiperf-" + filename + "-"
 
 
 def L1Gbps(pkt_size, Mpps):
@@ -21,8 +25,8 @@ def L2Gbps(pkt_size, Mpps):
     return Mbps / 1e3
 
 
-def plot_L1Gbps(packet_sizes, Mppss, link_speed_bps):
-    prefix = get_prefix()
+def plot_L1Gbps(packet_sizes, Mppss, link_speed_bps, filename):
+    prefix = get_prefix(filename)
 
     X = packet_sizes
     Y = []
@@ -68,8 +72,8 @@ def plot_L1Gbps(packet_sizes, Mppss, link_speed_bps):
     plt.savefig(prefix + "L1Gbps.png")
 
 
-def plot_L2Gbps(packet_sizes, Mppss, link_speed_bps):
-    prefix = get_prefix()
+def plot_L2Gbps(packet_sizes, Mppss, link_speed_bps, filename):
+    prefix = get_prefix(filename)
 
     X = packet_sizes
     Y = []
@@ -115,8 +119,8 @@ def plot_L2Gbps(packet_sizes, Mppss, link_speed_bps):
     plt.savefig(prefix + "L2Gbps.png")
 
 
-def plot_Mpps(packet_sizes, Mppss, link_speed_bps):
-    prefix = get_prefix()
+def plot_Mpps(packet_sizes, Mppss, link_speed_bps, filename):
+    prefix = get_prefix(filename)
 
     X = packet_sizes
     Y = Mppss

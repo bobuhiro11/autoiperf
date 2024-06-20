@@ -9,12 +9,24 @@ It can also output and get the following figures:
 
 ## Usage
 
+### TCP
+
 ```bash
 # On server side:
 iperf -s
 
 # On client side:
 python -m autoiperf.main
+```
+
+### UDP
+
+```bash
+# On server side:
+while true; do iperf -s -u; done
+
+# On client side:
+python -m autoiperf.main -u
 ```
 
 ## Theoretical values
