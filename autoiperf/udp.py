@@ -57,6 +57,7 @@ def run_iperf(client_ip, n, pkt_size, mpps):
         ]
 
     ok = False
+    output = {}
 
     for _ in range(2):
         subprocess.run(['rm', '-f', '/tmp/iperf.json'])
@@ -75,10 +76,18 @@ def run_iperf(client_ip, n, pkt_size, mpps):
 
     latency = stop_ping_background(process)
 
-    print('    {} pkt_size={} n={} mpps={:.3f} latency="{}" cmd="{}"'.format(
-        'OK' if ok else 'NG', pkt_size, n, mpps, latency, ' '.join(args)))
+    print('    {} pkt_size={} n={} mpps={:.3f} cpu_host={:.1f} cpu_remote={:.1f} latency="{}" cmd="{}"'.format(  # noqa: E501
+        'OK' if ok else 'NG', pkt_size, n, mpps, get_cpu_total_host(output), get_cpu_total_remote(output), latency, ' '.join(args)))  # noqa: E501
 
     return ok
+
+
+def get_cpu_total_host(output):
+    return output['end']['cpu_utilization_percent']['host_total']
+
+
+def get_cpu_total_remote(output):
+    return output['end']['cpu_utilization_percent']['remote_total']
 
 
 def is_expected_tx_rate(output):
