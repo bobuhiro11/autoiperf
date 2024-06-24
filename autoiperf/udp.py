@@ -3,6 +3,7 @@ import subprocess
 import signal
 import time
 import json
+import os
 
 
 PING_RESULT_FILE = '/tmp/ping_result.txt'
@@ -67,6 +68,9 @@ def run_iperf(client_ip, n, pkt_size, mpps):
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT)
 
+        if not os.path.isfile('/tmp/iperf.json'):
+            continue
+
         with open('/tmp/iperf.json', 'r') as f:
             output = json.load(f)
 
@@ -83,16 +87,19 @@ def run_iperf(client_ip, n, pkt_size, mpps):
 
 
 def get_cpu_total_host(output):
-    return output['end']['cpu_utilization_percent']['host_total']
+    return output.get('end', {}).get('cpu_utilization_percent', {}).get('host_total', -1)
 
 
 def get_cpu_total_remote(output):
-    return output['end']['cpu_utilization_percent']['remote_total']
+    return output.get('end', {}).get('cpu_utilization_percent', {}).get('remote_total', -1)
 
 
 def is_expected_tx_rate(output):
-    expected = output['start']['target_bitrate']
-    actual = output['end']['sum']['bits_per_second']
+    expected = output.get('start', {}).get('target_bitrate', -1)
+    actual = output.get('end', {}).get('sum', -1).get('bits_per_second', -1)
+
+    if expected < 0 or actual < 0:
+        return False
 
     return actual / expected > 0.99
 
