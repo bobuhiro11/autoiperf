@@ -1,31 +1,6 @@
 import argparse
-import subprocess
 import autoiperf.plot as p
-
-
-def run_iperf(client_ip, n, mss):
-    output = ''
-    for _ in range(3):
-        result = subprocess.run([
-            'iperf', '-c', client_ip, '-i', '1', '-t', '10',
-            '--format', 'bits', '-M', str(mss),
-            '-P', str(n)], stdout=subprocess.PIPE)
-        output += result.stdout.decode("utf-8")
-    return output
-
-
-def get_mpps(output, mss):
-    max_bps = -1
-    # Parse the output and get the maximum bandwidth.
-    lines = output.split('\n')
-    for line in lines:
-        if 'bits/sec' not in line:
-            continue
-        bps = float(line.split(' ')[-2])
-        max_bps = max(max_bps, bps)
-
-    mpps = max_bps / (mss * 8) / 1e6
-    return mpps
+from autoiperf import tcp, udp
 
 
 def main():
@@ -36,6 +11,8 @@ def main():
     parser.add_argument('client_ip', help='Client IP address')
     parser.add_argument('n', type=int, help='Number of parallel connections')
     parser.add_argument('link_speed', type=int, help='Link speed in Gbps')
+    parser.add_argument('-f', type=str, help='Output file name')
+    parser.add_argument('-u', action='store_true', help='Use UDP')
 
     args = parser.parse_args()
 
@@ -46,9 +23,13 @@ def main():
 
     Mppss = []
     for pkt_size in pkt_sizes:
-        mss = pkt_size - 40
-        output = run_iperf(args.client_ip, args.n, mss)
-        mpps = get_mpps(output, mss)
+        mpps = []
+
+        if args.u:
+            mpps = udp.run(args.client_ip, args.n, pkt_size)
+        else:
+            mpps = tcp.run(args.client_ip, args.n, pkt_size)
+
         l1gbps = p.L1Gbps(pkt_size, mpps)
         print('pkt_size', pkt_size,
               'mpps', mpps,
@@ -56,9 +37,9 @@ def main():
         Mppss.append(mpps)
 
     # Plot
-    p.plot_L1Gbps(pkt_sizes, Mppss, args.link_speed*1e9)
-    p.plot_L2Gbps(pkt_sizes, Mppss, args.link_speed*1e9)
-    p.plot_Mpps(pkt_sizes, Mppss, args.link_speed*1e9)
+    p.plot_L1Gbps(pkt_sizes, Mppss, args.link_speed*1e9, args.f)
+    p.plot_L2Gbps(pkt_sizes, Mppss, args.link_speed*1e9, args.f)
+    p.plot_Mpps(pkt_sizes, Mppss, args.link_speed*1e9, args.f)
 
 
 if __name__ == '__main__':
