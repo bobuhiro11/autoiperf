@@ -46,7 +46,7 @@ def run_iperf(client_ip, n, pkt_size, mpps):
     args = [
         'iperf3',
         '-c', client_ip,
-        '-t', '3',
+        '-t', '5',
         '-u',
         '-P', str(n),
         '-l', str(size),
@@ -60,7 +60,7 @@ def run_iperf(client_ip, n, pkt_size, mpps):
     ok = False
     output = {}
 
-    for _ in range(2):
+    for _ in range(5):
         subprocess.run(['rm', '-f', '/tmp/iperf.json'])
 
         _ = subprocess.run(
@@ -126,7 +126,7 @@ def is_low_drop_rate(output):
 
 def run(client_ip, n, pkt_size):
     left_mpps = 0.0
-    right_mpps = 10.0
+    right_mpps = 3.0
 
     while right_mpps - left_mpps > 0.01:
         mpps = (left_mpps + right_mpps) / 2
