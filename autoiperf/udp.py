@@ -71,8 +71,11 @@ def run_iperf(client_ip, n, pkt_size, mpps):
         if not os.path.isfile('/tmp/iperf.json'):
             continue
 
-        with open('/tmp/iperf.json', 'r') as f:
-            output = json.load(f)
+        try:
+            with open('/tmp/iperf.json', 'r') as f:
+                output = json.load(f)
+        except:  # noqa: E722
+            continue
 
         if is_expected_tx_rate(output) and is_low_drop_rate(output):
             ok = True
@@ -96,7 +99,7 @@ def get_cpu_total_remote(output):
 
 def is_expected_tx_rate(output):
     expected = output.get('start', {}).get('target_bitrate', -1)
-    actual = output.get('end', {}).get('sum', -1).get('bits_per_second', -1)
+    actual = output.get('end', {}).get('sum', {}).get('bits_per_second', -1)
 
     if expected < 0 or actual < 0:
         return False
