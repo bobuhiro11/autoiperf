@@ -4,6 +4,7 @@ import signal
 import time
 import json
 import os
+import autoiperf.plot as p
 
 
 PING_RESULT_FILE = '/tmp/ping_result.txt'
@@ -46,7 +47,7 @@ def run_iperf(client_ip, n, pkt_size, mpps):
     args = [
         'iperf3',
         '-c', client_ip,
-        '-t', '5',
+        '-t', '3',
         '-u',
         '-P', str(n),
         '-l', str(size),
@@ -60,7 +61,7 @@ def run_iperf(client_ip, n, pkt_size, mpps):
     ok = False
     output = {}
 
-    for _ in range(5):
+    for _ in range(3):
         subprocess.run(['rm', '-f', '/tmp/iperf.json'])
 
         _ = subprocess.run(
@@ -83,8 +84,8 @@ def run_iperf(client_ip, n, pkt_size, mpps):
 
     latency = stop_ping_background(process)
 
-    print('    {} pkt_size={} n={} mpps={:.3f} cpu_host={:.1f} cpu_remote={:.1f} latency="{}" cmd="{}"'.format(  # noqa: E501
-        'OK' if ok else 'NG', pkt_size, n, mpps, get_cpu_total_host(output), get_cpu_total_remote(output), latency, ' '.join(args)))  # noqa: E501
+    print('    {} pkt_size={} n={} mpps={:.3f} L1Gbps={:.3f} cpu_host={:.1f} cpu_remote={:.1f} latency="{}" cmd="{}"'.format(  # noqa: E501
+        'OK' if ok else 'NG', pkt_size, n, mpps, p.L1Gbps(pkt_size, mpps), get_cpu_total_host(output), get_cpu_total_remote(output), latency, ' '.join(args)))  # noqa: E501
 
     return ok
 

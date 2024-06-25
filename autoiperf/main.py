@@ -13,13 +13,13 @@ def main():
     parser.add_argument('link_speed', type=int, help='Link speed in Gbps')
     parser.add_argument('-f', type=str, help='Output file name')
     parser.add_argument('-u', action='store_true', help='Use UDP')
+    parser.add_argument('-s', type=str, help='The list of packet size',
+                        default='128,256,512,1024,1280,1518')
 
     args = parser.parse_args()
 
-    pkt_sizes = [1518, 1280, 1024, 512, 256, 128]
-
-    # For Jumbo frames.
-    # pkt_sizes = [8192, 4096, 2048, 1518, 1280, 1024, 512, 256, 128]
+    pkt_sizes = list(map(int, args.s.split(',')))
+    pkt_sizes.reverse()
 
     Mppss = []
     for pkt_size in pkt_sizes:
